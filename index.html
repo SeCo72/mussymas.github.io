@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mussy Mas - Tu Radio Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-size: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .player-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        .live-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-indicator.live {
+            background: #ff4444;
+            color: white;
+        }
+
+        .live-indicator.auto {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .live-indicator.live .live-dot {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .album-art {
+            width: 180px;
+            height: 180px;
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-art.playing {
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .now-playing {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .song-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .song-artist {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        .play-icon, .pause-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .play-icon {
+            border-width: 12px 0 12px 20px;
+            border-color: transparent transparent transparent #667eea;
+            margin-left: 4px;
+        }
+
+        .pause-icon {
+            width: 20px;
+            height: 24px;
+            position: relative;
+        }
+
+        .pause-icon::before,
+        .pause-icon::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 24px;
+            background: #667eea;
+        }
+
+        .pause-icon::before {
+            left: 0;
+        }
+
+        .pause-icon::after {
+            right: 0;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .social-link {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 28px;
+            color: white;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .facebook {
+            background: #1877f2;
+        }
+
+        .youtube {
+            background: #ff0000;
+        }
+
+        .tiktok {
+            background: #000000;
+        }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="%23ffffff" fill-opacity="0.1"/></svg>');
+            background-size: cover;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .logo {
+                width: 120px;
+                height: 120px;
+                font-size: 48px;
+            }
+
+            .social-link {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .album-art {
+                width: 150px;
+                height: 150px;
+            }
+
+            .volume-slider {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">MM</div>
+        
+        <h1>MUSSYMAS</h1>
+        <p class="tagline">Tu música, tu estilo, tu radio</p>
+        
+        <div class="player-container">
+            <div class="live-indicator auto" id="liveIndicator">
+                <div class="live-dot"></div>
+                <span id="liveText">AUTOMÁTICO</span>
+            </div>
+
+            <div class="album-art" id="albumArt">
+                <img src="https://via.placeholder.com/180/667eea/ffffff?text=MM" alt="Album Art" id="albumImage">
+            </div>
+
+            <div class="now-playing">
+                <div class="song-title" id="songTitle">Conectando...</div>
+                <div class="song-artist" id="songArtist">Cargando información...</div>
+            </div>
+
+            <div class="controls">
+                <button class="play-button" id="playButton">
+                    <div class="play-icon"></div>
+                </button>
+
+                <div class="volume-control">
+                    <span style="color: white; font-size: 20px;">🔊</span>
+                    <input type="range" min="0" max="100" value="70" class="volume-slider" id="volumeSlider">
+                </div>
+            </div>
+
+            <audio id="audioPlayer" preload="none"></audio>
+        </div>
+
+        <div class="social-links">
+            <a href="https://facebook.com/tu-pagina" target="_blank" class="social-link facebook" title="Facebook">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+            </a>
+            
+            <a href="https://youtube.com/@tu-canal" target="_blank" class="social-link youtube" title="YouTube">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+            </a>
+            
+            <a href="https://tiktok.com/@tu-usuario" target="_blank" class="social-link tiktok" title="TikTok">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="wave"></div>
+
+    <script>
+        // CONFIGURA AQUÍ TU INFORMACIÓN
+        const STATION_URL = 'https://admin.mussymas.com'; // Tu dominio de AzuraCast
+        const STATION_ID = 'mussymas'; // El ID o nombre corto de tu estación
+        const STREAM_URL = `${STATION_URL}/listen/${STATION_ID}/radio.mp3`; // URL del stream
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const songTitle = document.getElementById('songTitle');
+        const songArtist = document.getElementById('songArtist');
+        const albumArt = document.getElementById('albumArt');
+        const albumImage = document.getElementById('albumImage');
+        const liveIndicator = document.getElementById('liveIndicator');
+        const liveText = document.getElementById('liveText');
+
+        let isPlaying = false;
+
+        // Configurar stream
+        audioPlayer.src = STREAM_URL;
+        audioPlayer.volume = 0.7;
+
+        // Control de Play/Pause
+        playButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playButton.innerHTML = '<div class="play-icon"></div>';
+                albumArt.classList.remove('playing');
+            } else {
+                audioPlayer.play();
+                playButton.innerHTML = '<div class="pause-icon"></div>';
+                albumArt.classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Control de volumen
+        volumeSlider.addEventListener('input', (e) => {
+            audioPlayer.volume = e.target.value / 100;
+        });
+
+        // Función para obtener información actual
+        async function getNowPlaying() {
+            try {
+                const response = await fetch(`${STATION_URL}/api/nowplaying/${STATION_ID}`);
+                const data = await response.json();
+
+                // Actualizar información de la canción
+                if (data.now_playing) {
+                    const song = data.now_playing.song;
+                    songTitle.textContent = song.title || 'Título desconocido';
+                    songArtist.textContent = song.artist || 'Artista desconocido';
+
+                    // Actualizar portada
+                    if (song.art) {
+                        albumImage.src = song.art;
+                    }
+
+                    // Verificar si hay DJ en vivo
+                    if (data.live && data.live.is_live) {
+                        liveIndicator.classList.remove('auto');
+                        liveIndicator.classList.add('live');
+                        liveText.textContent = '🔴 EN VIVO';
+                    } else {
+                        liveIndicator.classList.remove('live');
+                        liveIndicator.classList.add('auto');
+                        liveText.textContent = 'AUTOMÁTICO';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al obtener información:', error);
+            }
+        }
+
+        // Actualizar información cada 10 segundos
+        getNowPlaying();
+        setInterval(getNowPlaying, 10000);
+    </script>
+</body>
+</html>
